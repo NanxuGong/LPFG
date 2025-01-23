@@ -37,8 +37,6 @@ np.random.seed(30)
 def test(train_x, train_y, test_x, test_y):
     print(train_x.shape)
     clf = RandomForestClassifier()
-    # clf = TabPFNClassifier(device=('cuda' if torch.cuda.is_available() else 'cpu'), N_ensemble_configurations=4)
-    # clf.fit = partial(clf.fit, overwrite_warning=True)
 
     clf.fit(train_x, train_y)
     pred = clf.predict(test_x)
@@ -164,15 +162,6 @@ def baseline():
     dataset_description = ds[-1]
 
     df_train, df_test = make_datasets_numeric(df_train, df_test, target_column_name)
-    # del cc_test_datasets_multiclass[6]
-    # del cc_test_datasets_multiclass[1]   
-    # del cc_test_datasets_multiclass[0]
-    # del cc_test_datasets_multiclass[0]
-    # del cc_test_datasets_multiclass[0]
-    # del cc_test_datasets_multiclass[0]
-    # del cc_test_datasets_multiclass[0]
-    # del cc_test_datasets_multiclass[0]
-    # for ds_ in cc_test_datasets_multiclass:
     ds_ = cc_test_datasets_multiclass[0]
     ds, df_train, df_test, _, _ = data.get_data_split(ds_, seed=0)
     column_name = ds[4][:-1]
@@ -197,9 +186,7 @@ def main():
     cc_test_datasets_multiclass = data.load_all_data()
     
     print(len(cc_test_datasets_multiclass))
-    
-    # del cc_test_datasets_multiclass[6]
-    # del cc_test_datasets_multiclass[1]  
+
     ds = cc_test_datasets_multiclass[args.task_id]
     ds, df_train, df_test, _, _ = data.get_data_split(ds, seed=0)
     column_name = ds[4][:-1]
@@ -225,7 +212,7 @@ def main():
     # print(prt_optimizer)
     mssa_optimizer = [sys_optimizer, prt_optimizer]
     optimizer_model = openai.ChatCompletion.create(
-        model=args.gpt_model,  # 或者使用其他可用模型，例如 "gpt-4-turbo"
+        model=args.gpt_model,  
         messages=mssa_optimizer,
         # max_tokens=2048,
         n=1,
@@ -239,7 +226,7 @@ def main():
     # print(prt_generator)
     mssa_generator = [sys_generator, prt_generator]
     generator_model = openai.ChatCompletion.create(
-        model=args.gpt_model,  # 或者使用其他可用模型，例如 "gpt-4-turbo"
+        model=args.gpt_model,  
         messages=mssa_generator,
         # max_tokens=2048,
         n=1,
@@ -267,11 +254,11 @@ def main():
         mssa_optimizer.append({'role': 'assistant', 'content': generated_optimizer})
         start_index = generated_generator.find("Generated Features")
         if start_index != -1:
-            extracted_text = generated_generator[start_index:] #'new feature 1: ' #
+            extracted_text = generated_generator[start_index:]
             # print(extracted_text)
             mssa_optimizer.append({'role': 'user', 'content': optimizer_next(extracted_text)})
             optimizer_model = openai.ChatCompletion.create(
-            model=args.gpt_model,  # 或者使用其他可用模型，例如 "gpt-4-turbo"
+            model=args.gpt_model,  
             messages=[
                 sys_optimizer, prt_optimizer
             ],
@@ -285,7 +272,7 @@ def main():
             # sys_generator, prt_generator = generator_prompt(df_train, target_column_name, dataset_description, generated_optimizer, column_name, train_x) #"what are the generated features"#
             mssa_generator.append({'role': 'user', 'content': generator_next(generated_optimizer)})
             generator_model = openai.ChatCompletion.create(
-                model=args.gpt_model,  # 或者使用其他可用模型，例如 "gpt-4-turbo"
+                model=args.gpt_model,  
                 messages=mssa_generator,
                 # max_tokens=2048,
                 n=1,
